@@ -1,0 +1,238 @@
+---
+title: "pm566-midterm-draft2"
+author: "Misha Khan"
+date: "2022-10-22"
+output: github_document
+always_allow_html: true
+---
+
+```{r}
+library(stringr)
+library(dplyr)
+library(tidyverse)
+library(rvest)
+library(xml2)
+library(dbplyr)
+library(dplyr)
+library(skimr) 
+library(ggplot2)
+library(data.table)
+library(lubridate)
+library(leaflet)
+library(webshot)
+```
+
+Topic: Crime Data from 2020 to Present in Los Angeles
+Missing data (0, 0) for long and lat are for privacy
+URL: https://data.lacity.org/Public-Safety/Crime-Data-from-2020-to-Present/2nrs-mtv8
+```{r}
+crimeraw <- read.csv("Crime_Data_from_2020_to_Present.csv")
+```
+
+Data Cleaning
+Rename cols to make it more meaningful
+```{r}
+colnames(crimeraw) <- c('Record No',
+                        'Date Reported',
+                        'Date Occurred',
+                        'Time Occurred',
+                        'Area No',
+                        'Area',
+                        'Rpt Dist No', #drop
+                        'Part', #drop
+                        'Crime Code',
+                        'Crime',
+                        'MO', #drop
+                        'Victim Age',
+                        'Victim Sex',
+                        'Victim Ethnicity',
+                        'Premise Code',
+                        'Premise',
+                        'Weapon Code',
+                        'Weapon',
+                        'Case Code',
+                        'Case Status',
+                        'Crime Code 1',
+                        'Crime Code 2',
+                        'Crime Code 3',
+                        'Crime Code 4',
+                        'Location',
+                        'Cross Street',
+                        'Lat',
+                        'Lon'
+                        )
+
+crimeraw <- select(crimeraw, -c('Rpt Dist No','Part', 'MO','Crime Code 1', 'Crime Code 2', 'Crime Code 3', 'Crime Code 4', 'Cross Street'))
+```
+
+Reformat date variables (EDA: Date when most crimes occur)
+```{r}
+crimeraw$`Date Reported` <- as.Date(crimeraw$`Date Reported`, format = "%m/%d/%Y")
+crimeraw$`Date Occurred` <- as.Date(crimeraw$`Date Occurred`, format = "%m/%d/%Y")
+```
+
+Change miltary to standard time (Possible EDA: Time when most crime occur)
+```{r}
+crimeraw$`Time Occurred` <- format(strptime(substr(as.POSIXct(sprintf("%04.0f", crimeraw$`Time Occurred`), 
+                                 format="%H%M"), 12, 16), '%H:%M'), '%I:%M %p')
+```
+
+View missing data
+```{r}
+skimr::skim(crimeraw)
+```
+
+MISSING: Weapon Code
+EMPTY: Victim Sex, Victim Ethnicity, Premise, Weapon
+IF missing, change to 999
+FIX: empty cells will not change to value or NA
+```{r}
+crimeraw$`Weapon Code` <- crimeraw$`Weapon Code` %>% replace_na(999)
+```
+
+
+New dataset created
+*START HERE*
+```{r}
+#Save as changes as a new file
+#write_rds(crimeraw, "crimedatnew.rds")
+crimedat <- read_rds("crimedatnew.rds")
+crimecopy <- crimedat
+crimedat <- as.data.frame(crimedat)
+```
+
+EDA: What is the amount of crime per area in LA from 2020-2022?
+What is the proportion of crime?
+```{r}
+crime_frequency <-count(crimedat, Area)
+nc <- sum(crime_frequency$n)
+
+crime_frequency %>% 
+  arrange(desc(n)) %>%
+  mutate(Percent = round( n / nc * 100, 2))  %>%
+knitr::kable()
+```
+```{r}
+crime_frequency <- crime_frequency %>% arrange(desc(n))
+```
+
+
+```{r}
+# Pie Chart with Percentages
+slices <- crime_frequency$n[1:10]
+lbls <- c("Central", "77th Street", "Pacific", "Southwest", "Hollywood", "Southeast", "N Hollywood", "Newton", "Olympic", "Wilshire")
+pct <- round(slices/sum(slices)*100, 2)
+lbls <- paste(lbls, pct) # add percents to labels
+lbls <- paste(lbls,"%",sep="") # ad % to labels
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+   main="Proportion of Top 10 Areas in Crime")
+```
+Visualization of top 10 areas
+```{r}
+v1 <- table(crimedat$`Area`)
+barplot(sort(v1, T)[1:10], las = 2, col = rainbow(12), cex.names= .7, main = "Top 10 Areas with Crime", xlab = "Area", ylab = "Count")     
+```
+
+Get month before counting crimes by month and area.
+
+```{r}
+crimedat$Month = format(crimedat$`Date Occurred`, "%B")
+```
+
+#MY EDITS
+```{r}
+#Create CrimeCount col for the Area
+crime_count_month <-   #Instead of changing org dataframe (crimedat), I create a new df
+  crimedat %>%
+  group_by(Month, `Area`) %>% 
+  summarize(CrimeCount = n())
+```
+
+
+Find month with the highest crime (3 years of data)
+```{r}
+crime_count_month %>%
+ggplot(aes(x = Month, y = CrimeCount, fill = Area)) +
+  geom_bar(stat = "identity")
+```
+
+
+```{r}
+crimedat$Year = format(crimedat$`Date Occurred`, "%Y")
+```
+
+```{r}
+#Create CrimeCount col for the Area
+crime_count_year <-   
+  crimedat %>%
+  group_by(Year, `Area`) %>% 
+  summarize(CrimeCount = n())
+```
+
+
+Find year with the highest crime (3 years of data)
+```{r}
+crime_count_year %>%
+ggplot(aes(x = Year, y = CrimeCount, fill = Area)) +
+  geom_bar(stat = "identity")
+```
+
+Find the most reported crime
+```{r}
+crimedat %>%
+  group_by(`Crime Code`, `Crime`) %>%
+  summarise(n = n())  %>% 
+  arrange(desc(n)) %>%
+  knitr::kable()
+```
+Create a most common crimes df
+```{r}
+crime_top_areas <- crimedat %>%
+  select(`Crime Code`, `Crime`, `Year`, `Lat`, `Lon`)  
+```
+Subset to top 10 using Crime Code in 2021
+```{r}
+crime_top_areas <- subset(crime_top_areas, 
+                          `Crime Code` %in% c("510", "624", "330", "740", "310", "230", "354", "440", "626", "420") &
+                          `Year` %in% c("2021"))
+```
+
+Map color palette
+```{r}
+crime.pal <- colorFactor(c('red', 'yellow', 'blue', 'green'), domain = crime_top_areas$`Crime`)
+```
+
+Map of the area of top 10 crimes in 2021
+```{r}
+crime_map <- 
+  leaflet(crime_top_areas) %>%  
+  addProviderTiles('CartoDB.Positron') %>% 
+  addCircles(
+    lat = ~Lat, 
+    lng = ~Lon,
+    label = ~paste0(crime_top_areas$`Crime`),
+    color = ~ crime.pal(crime_top_areas$`Crime`),
+    opacity = 0.5,
+    fillOpacity = 1,
+    radius = 500
+    ) %>%
+  addLegend('bottomleft', 
+            pal = crime.pal,  
+            values = crime_top_areas$`Crime`,
+            title = 'Top Crimes per Area', 
+            opacity = 1)
+crime_map
+```
+
+Finding the outlier coordinate near Africa
+```{r}
+range(crime_top_areas$Lat)
+range(crime_top_areas$Lon)
+```
+
+```{r}
+library(CoordinateCleaner)
+#cc_outl(crime_top_areas,
+#        method = "quantile", 
+#        value = "flagged")
+```
