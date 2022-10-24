@@ -135,7 +135,7 @@ the highest crime. In this report, I’ll be taking a closer look at the
 proportion of crime per area, most common crimes committed in certain
 areas, and victim demographic breakdown.
 
-#### Data Cleaning
+### Data Cleaning
 
 ``` r
 #Rename the columns to be more descriptive
@@ -250,8 +250,8 @@ crimeraw$`Weapon Code` <- crimeraw$`Weapon Code` %>% replace_na(999)
 
 I used 999 to signify there was no weapon used instead of NA.
 
-The dataset crimeraw is now 584,004 observations and 21 variables. This
-process removed 2,291 rows.
+The crimeraw dataset is now 584,004 observations and 21 variables.
+Overall, the cleaning process removed 2,291 rows.
 
 After I cleaned the data, I saved it as an .rds file.
 
@@ -263,9 +263,9 @@ crimecopy <- crimedat #make a copy for reference
 crimedat <- as.data.frame(crimedat)
 ```
 
-#### EDA
+### EDA
 
-##### EDA \#1: What is the amount of crime per area in LA from 2020-2022?
+#### EDA \#1: What is the amount of crime per area in LA from 2020-2022?
 
 ``` r
 #Calculate proportion of crime per area
@@ -314,11 +314,11 @@ barplot(sort(v1, T)[1:10], las = 2, col = rainbow(12), cex.names= .7, main = "To
 ```
 
 ![](pm566-midterm-final_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-There is Central and 77th Street and noticeably higher in crime compared
-to the rest of the areas. There is a 3,622 difference in reports
-comparing 77th Street and Pacific.
+Central and 77th Street are noticeably higher in crime compared to the
+rest of the areas. There is a 3,622 difference in reports comparing 77th
+Street and Pacific.
 
-##### EDA \#2: What is the top 5 most crimes in Central and 77th Street in 2021?
+#### EDA \#2: What is the top 5 most crimes in Central and 77th Street in 2021?
 
 **Central**
 
@@ -366,113 +366,21 @@ central_top_crimes %>%
   group_by(Area, `Crime Code`, Crime) %>%
   summarise(Count = n()) %>%
   arrange(desc(Count)) %>%
+  head(,10) %>%
   knitr::kable()
 ```
 
     ## `summarise()` has grouped output by 'Area', 'Crime Code'. You can override
     ## using the `.groups` argument.
 
-| Area    | Crime Code | Crime                                                     | Count |
-|:--------|-----------:|:----------------------------------------------------------|------:|
-| Central |        330 | BURGLARY FROM VEHICLE                                     |  1660 |
-| Central |        624 | BATTERY - SIMPLE ASSAULT                                  |  1404 |
-| Central |        740 | VANDALISM - FELONY (\$400 & OVER, ALL CHURCH VANDALISMS)  |  1008 |
-| Central |        230 | ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT            |   914 |
-| Central |        440 | THEFT PLAIN - PETTY (\$950 & UNDER)                       |   895 |
-| Central |        510 | VEHICLE - STOLEN                                          |   834 |
-| Central |        210 | ROBBERY                                                   |   676 |
-| Central |        341 | THEFT-GRAND (\$950.01 & OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD |   559 |
-| Central |        310 | BURGLARY                                                  |   516 |
-| Central |        626 | INTIMATE PARTNER - SIMPLE ASSAULT                         |   506 |
-| Central |        745 | VANDALISM - MISDEAMEANOR (\$399 OR UNDER)                 |   330 |
-| Central |        354 | THEFT OF IDENTITY                                         |   301 |
-| Central |        331 | THEFT FROM MOTOR VEHICLE - GRAND (\$950.01 AND OVER)      |   279 |
-| Central |        480 | BIKE - STOLEN                                             |   275 |
-| Central |        761 | BRANDISH WEAPON                                           |   267 |
-| Central |        420 | THEFT FROM MOTOR VEHICLE - PETTY (\$950 & UNDER)          |   253 |
-| Central |        930 | CRIMINAL THREATS - NO WEAPON DISPLAYED                    |   232 |
-| Central |        236 | INTIMATE PARTNER - AGGRAVATED ASSAULT                     |   177 |
-| Central |        888 | TRESPASSING                                               |   176 |
-| Central |        442 | SHOPLIFTING - PETTY THEFT (\$950 & UNDER)                 |   158 |
-| Central |        350 | THEFT, PERSON                                             |   138 |
-| Central |        625 | OTHER ASSAULT                                             |   138 |
-| Central |        220 | ATTEMPTED ROBBERY                                         |   130 |
-| Central |        121 | RAPE, FORCIBLE                                            |    97 |
-| Central |        956 | LETTERS, LEWD - TELEPHONE CALLS, LEWD                     |    81 |
-| Central |        946 | OTHER MISCELLANEOUS CRIME                                 |    80 |
-| Central |        860 | BATTERY WITH SEXUAL CONTACT                               |    72 |
-| Central |        623 | BATTERY POLICE (SIMPLE)                                   |    65 |
-| Central |        901 | VIOLATION OF RESTRAINING ORDER                            |    64 |
-| Central |        668 | EMBEZZLEMENT, GRAND THEFT (\$950.01 & OVER)               |    51 |
-| Central |        648 | ARSON                                                     |    50 |
-| Central |        662 | BUNCO, GRAND THEFT                                        |    39 |
-| Central |        845 | SEX OFFENDER REGISTRANT OUT OF COMPLIANCE                 |    31 |
-| Central |        900 | VIOLATION OF COURT ORDER                                  |    31 |
-| Central |        352 | PICKPOCKET                                                |    30 |
-| Central |        664 | BUNCO, PETTY THEFT                                        |    26 |
-| Central |        110 | CRIMINAL HOMICIDE                                         |    25 |
-| Central |        437 | RESISTING ARREST                                          |    24 |
-| Central |        320 | BURGLARY, ATTEMPTED                                       |    22 |
-| Central |        850 | INDECENT EXPOSURE                                         |    20 |
-| Central |        343 | SHOPLIFTING-GRAND THEFT (\$950.01 & OVER)                 |    19 |
-| Central |        753 | DISCHARGE FIREARMS/SHOTS FIRED                            |    19 |
-| Central |        815 | SEXUAL PENETRATION W/FOREIGN OBJECT                       |    18 |
-| Central |        820 | ORAL COPULATION                                           |    18 |
-| Central |        231 | ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER              |    17 |
-| Central |        755 | BOMB SCARE                                                |    16 |
-| Central |        520 | VEHICLE - ATTEMPT STOLEN                                  |    14 |
-| Central |        622 | BATTERY ON A FIREFIGHTER                                  |    14 |
-| Central |        649 | DOCUMENT FORGERY / STOLEN FELONY                          |    14 |
-| Central |        762 | LEWD CONDUCT                                              |    13 |
-| Central |        890 | FAILURE TO YIELD                                          |    13 |
-| Central |        450 | THEFT FROM PERSON - ATTEMPT                               |    10 |
-| Central |        910 | KIDNAPPING                                                |    10 |
-| Central |        237 | CHILD NEGLECT (SEE 300 W.I.C.)                            |     9 |
-| Central |        434 | FALSE IMPRISONMENT                                        |     9 |
-| Central |        821 | SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH   |     9 |
-| Central |        441 | THEFT PLAIN - ATTEMPT                                     |     8 |
-| Central |        886 | DISTURBING THE PEACE                                      |     8 |
-| Central |        940 | EXTORTION                                                 |     8 |
-| Central |        251 | SHOTS FIRED AT INHABITED DWELLING                         |     7 |
-| Central |        410 | BURGLARY FROM VEHICLE, ATTEMPTED                          |     7 |
-| Central |        522 | VEHICLE - MOTORIZED SCOOTERS, BICYCLES, AND WHEELCHAIRS   |     7 |
-| Central |        903 | CONTEMPT OF COURT                                         |     7 |
-| Central |        627 | CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT                   |     5 |
-| Central |        951 | DEFRAUDING INNKEEPER/THEFT OF SERVICES, \$950 & UNDER     |     5 |
-| Central |        250 | SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT          |     4 |
-| Central |        647 | THROWING OBJECT AT MOVING VEHICLE                         |     4 |
-| Central |        813 | CHILD ANNOYING (17YRS & UNDER)                            |     4 |
-| Central |        920 | KIDNAPPING - GRAND ATTEMPT                                |     4 |
-| Central |        122 | RAPE, ATTEMPTED                                           |     3 |
-| Central |        421 | THEFT FROM MOTOR VEHICLE - ATTEMPT                        |     3 |
-| Central |        438 | RECKLESS DRIVING                                          |     3 |
-| Central |        661 | UNAUTHORIZED COMPUTER ACCESS                              |     3 |
-| Central |        763 | STALKING                                                  |     3 |
-| Central |        810 | SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ  |     3 |
-| Central |        433 | DRIVING WITHOUT OWNER CONSENT (DWOC)                      |     2 |
-| Central |        660 | COUNTERFEIT                                               |     2 |
-| Central |        670 | EMBEZZLEMENT, PETTY THEFT (\$950 & UNDER)                 |     2 |
-| Central |        921 | HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE                 |     2 |
-| Central |        928 | THREATENING PHONE CALLS/LETTERS                           |     2 |
-| Central |        943 | CRUELTY TO ANIMALS                                        |     2 |
-| Central |        235 | CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT               |     1 |
-| Central |        351 | PURSE SNATCHING                                           |     1 |
-| Central |        353 | DRUNK ROLL                                                |     1 |
-| Central |        439 | FALSE POLICE REPORT                                       |     1 |
-| Central |        451 | PURSE SNATCHING - ATTEMPT                                 |     1 |
-| Central |        452 | PICKPOCKET, ATTEMPT                                       |     1 |
-| Central |        471 | TILL TAP - PETTY (\$950 & UNDER)                          |     1 |
-| Central |        651 | DOCUMENT WORTHLESS (\$200.01 & OVER)                      |     1 |
-| Central |        756 | WEAPONS POSSESSION/BOMBING                                |     1 |
-| Central |        760 | LEWD/LASCIVIOUS ACTS WITH CHILD                           |     1 |
-| Central |        812 | CRM AGNST CHLD (13 OR UNDER) (14-15 & SUSP 10 YRS OLDER)  |     1 |
-| Central |        814 | CHILD PORNOGRAPHY                                         |     1 |
-| Central |        840 | BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM  |     1 |
-| Central |        902 | VIOLATION OF TEMPORARY RESTRAINING ORDER                  |     1 |
-| Central |        904 | FIREARMS EMERGENCY PROTECTIVE ORDER (FIREARMS EPO)        |     1 |
-| Central |        932 | PEEPING TOM                                               |     1 |
-| Central |        944 | CONSPIRACY                                                |     1 |
-| Central |        949 | ILLEGAL DUMPING                                           |     1 |
+| Area    | Crime Code | Crime                                                    | Count |
+|:--------|-----------:|:---------------------------------------------------------|------:|
+| Central |        330 | BURGLARY FROM VEHICLE                                    |  1660 |
+| Central |        624 | BATTERY - SIMPLE ASSAULT                                 |  1404 |
+| Central |        740 | VANDALISM - FELONY (\$400 & OVER, ALL CHURCH VANDALISMS) |  1008 |
+| Central |        230 | ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT           |   914 |
+| Central |        440 | THEFT PLAIN - PETTY (\$950 & UNDER)                      |   895 |
+| Central |        510 | VEHICLE - STOLEN                                         |   834 |
 
 The top 5 crimes in Central area are: Burglary from Vehicle - 1,660
 reports, Battery (Simple Assault) - 1,404 reports, Vandalism - 1,008
@@ -537,115 +445,21 @@ st77_top_crimes %>%
   group_by(Area, `Crime Code`, Crime) %>%
   summarise(Count = n()) %>%
   arrange(desc(Count)) %>%
+  head(,10) %>%
   knitr::kable()
 ```
 
     ## `summarise()` has grouped output by 'Area', 'Crime Code'. You can override
     ## using the `.groups` argument.
 
-| Area        | Crime Code | Crime                                                     | Count |
-|:------------|-----------:|:----------------------------------------------------------|------:|
-| 77th Street |        510 | VEHICLE - STOLEN                                          |  1765 |
-| 77th Street |        230 | ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT            |  1331 |
-| 77th Street |        624 | BATTERY - SIMPLE ASSAULT                                  |  1001 |
-| 77th Street |        626 | INTIMATE PARTNER - SIMPLE ASSAULT                         |   905 |
-| 77th Street |        210 | ROBBERY                                                   |   841 |
-| 77th Street |        740 | VANDALISM - FELONY (\$400 & OVER, ALL CHURCH VANDALISMS)  |   772 |
-| 77th Street |        310 | BURGLARY                                                  |   512 |
-| 77th Street |        354 | THEFT OF IDENTITY                                         |   493 |
-| 77th Street |        745 | VANDALISM - MISDEAMEANOR (\$399 OR UNDER)                 |   461 |
-| 77th Street |        440 | THEFT PLAIN - PETTY (\$950 & UNDER)                       |   415 |
-| 77th Street |        236 | INTIMATE PARTNER - AGGRAVATED ASSAULT                     |   389 |
-| 77th Street |        330 | BURGLARY FROM VEHICLE                                     |   379 |
-| 77th Street |        930 | CRIMINAL THREATS - NO WEAPON DISPLAYED                    |   352 |
-| 77th Street |        761 | BRANDISH WEAPON                                           |   351 |
-| 77th Street |        420 | THEFT FROM MOTOR VEHICLE - PETTY (\$950 & UNDER)          |   334 |
-| 77th Street |        903 | CONTEMPT OF COURT                                         |   228 |
-| 77th Street |        341 | THEFT-GRAND (\$950.01 & OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD |   220 |
-| 77th Street |        331 | THEFT FROM MOTOR VEHICLE - GRAND (\$950.01 AND OVER)      |   205 |
-| 77th Street |        946 | OTHER MISCELLANEOUS CRIME                                 |   132 |
-| 77th Street |        220 | ATTEMPTED ROBBERY                                         |   118 |
-| 77th Street |        901 | VIOLATION OF RESTRAINING ORDER                            |   114 |
-| 77th Street |        350 | THEFT, PERSON                                             |    92 |
-| 77th Street |        753 | DISCHARGE FIREARMS/SHOTS FIRED                            |    87 |
-| 77th Street |        121 | RAPE, FORCIBLE                                            |    86 |
-| 77th Street |        251 | SHOTS FIRED AT INHABITED DWELLING                         |    76 |
-| 77th Street |        623 | BATTERY POLICE (SIMPLE)                                   |    76 |
-| 77th Street |        956 | LETTERS, LEWD - TELEPHONE CALLS, LEWD                     |    68 |
-| 77th Street |        110 | CRIMINAL HOMICIDE                                         |    63 |
-| 77th Street |        648 | ARSON                                                     |    63 |
-| 77th Street |        888 | TRESPASSING                                               |    55 |
-| 77th Street |        900 | VIOLATION OF COURT ORDER                                  |    51 |
-| 77th Street |        627 | CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT                   |    47 |
-| 77th Street |        812 | CRM AGNST CHLD (13 OR UNDER) (14-15 & SUSP 10 YRS OLDER)  |    47 |
-| 77th Street |        822 | HUMAN TRAFFICKING - COMMERCIAL SEX ACTS                   |    47 |
-| 77th Street |        662 | BUNCO, GRAND THEFT                                        |    46 |
-| 77th Street |        320 | BURGLARY, ATTEMPTED                                       |    45 |
-| 77th Street |        520 | VEHICLE - ATTEMPT STOLEN                                  |    43 |
-| 77th Street |        625 | OTHER ASSAULT                                             |    43 |
-| 77th Street |        250 | SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT          |    39 |
-| 77th Street |        442 | SHOPLIFTING - PETTY THEFT (\$950 & UNDER)                 |    39 |
-| 77th Street |        860 | BATTERY WITH SEXUAL CONTACT                               |    26 |
-| 77th Street |        910 | KIDNAPPING                                                |    24 |
-| 77th Street |        890 | FAILURE TO YIELD                                          |    22 |
-| 77th Street |        231 | ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER              |    21 |
-| 77th Street |        437 | RESISTING ARREST                                          |    21 |
-| 77th Street |        237 | CHILD NEGLECT (SEE 300 W.I.C.)                            |    20 |
-| 77th Street |        805 | PIMPING                                                   |    20 |
-| 77th Street |        649 | DOCUMENT FORGERY / STOLEN FELONY                          |    18 |
-| 77th Street |        820 | ORAL COPULATION                                           |    16 |
-| 77th Street |        921 | HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE                 |    16 |
-| 77th Street |        421 | THEFT FROM MOTOR VEHICLE - ATTEMPT                        |    15 |
-| 77th Street |        763 | STALKING                                                  |    15 |
-| 77th Street |        664 | BUNCO, PETTY THEFT                                        |    14 |
-| 77th Street |        922 | CHILD STEALING                                            |    14 |
-| 77th Street |        235 | CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT               |    13 |
-| 77th Street |        666 | BUNCO, ATTEMPT                                            |    13 |
-| 77th Street |        815 | SEXUAL PENETRATION W/FOREIGN OBJECT                       |    13 |
-| 77th Street |        668 | EMBEZZLEMENT, GRAND THEFT (\$950.01 & OVER)               |    11 |
-| 77th Street |        810 | SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ  |    11 |
-| 77th Street |        940 | EXTORTION                                                 |    10 |
-| 77th Street |        410 | BURGLARY FROM VEHICLE, ATTEMPTED                          |     9 |
-| 77th Street |        813 | CHILD ANNOYING (17YRS & UNDER)                            |     9 |
-| 77th Street |        928 | THREATENING PHONE CALLS/LETTERS                           |     9 |
-| 77th Street |        943 | CRUELTY TO ANIMALS                                        |     9 |
-| 77th Street |        845 | SEX OFFENDER REGISTRANT OUT OF COMPLIANCE                 |     8 |
-| 77th Street |        920 | KIDNAPPING - GRAND ATTEMPT                                |     8 |
-| 77th Street |        821 | SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH   |     7 |
-| 77th Street |        886 | DISTURBING THE PEACE                                      |     7 |
-| 77th Street |        122 | RAPE, ATTEMPTED                                           |     6 |
-| 77th Street |        480 | BIKE - STOLEN                                             |     6 |
-| 77th Street |        647 | THROWING OBJECT AT MOVING VEHICLE                         |     6 |
-| 77th Street |        762 | LEWD CONDUCT                                              |     6 |
-| 77th Street |        814 | CHILD PORNOGRAPHY                                         |     6 |
-| 77th Street |        850 | INDECENT EXPOSURE                                         |     6 |
-| 77th Street |        441 | THEFT PLAIN - ATTEMPT                                     |     5 |
-| 77th Street |        622 | BATTERY ON A FIREFIGHTER                                  |     4 |
-| 77th Street |        932 | PEEPING TOM                                               |     4 |
-| 77th Street |        351 | PURSE SNATCHING                                           |     3 |
-| 77th Street |        487 | BOAT - STOLEN                                             |     3 |
-| 77th Street |        755 | BOMB SCARE                                                |     3 |
-| 77th Street |        806 | PANDERING                                                 |     3 |
-| 77th Street |        902 | VIOLATION OF TEMPORARY RESTRAINING ORDER                  |     3 |
-| 77th Street |        343 | SHOPLIFTING-GRAND THEFT (\$950.01 & OVER)                 |     2 |
-| 77th Street |        434 | FALSE IMPRISONMENT                                        |     2 |
-| 77th Street |        438 | RECKLESS DRIVING                                          |     2 |
-| 77th Street |        443 | SHOPLIFTING - ATTEMPT                                     |     2 |
-| 77th Street |        450 | THEFT FROM PERSON - ATTEMPT                               |     2 |
-| 77th Street |        653 | CREDIT CARDS, FRAUD USE (\$950.01 & OVER)                 |     2 |
-| 77th Street |        880 | DISRUPT SCHOOL                                            |     2 |
-| 77th Street |        439 | FALSE POLICE REPORT                                       |     1 |
-| 77th Street |        444 | DISHONEST EMPLOYEE - PETTY THEFT                          |     1 |
-| 77th Street |        471 | TILL TAP - PETTY (\$950 & UNDER)                          |     1 |
-| 77th Street |        522 | VEHICLE - MOTORIZED SCOOTERS, BICYCLES, AND WHEELCHAIRS   |     1 |
-| 77th Street |        654 | CREDIT CARDS, FRAUD USE (\$950 & UNDER                    |     1 |
-| 77th Street |        661 | UNAUTHORIZED COMPUTER ACCESS                              |     1 |
-| 77th Street |        670 | EMBEZZLEMENT, PETTY THEFT (\$950 & UNDER)                 |     1 |
-| 77th Street |        760 | LEWD/LASCIVIOUS ACTS WITH CHILD                           |     1 |
-| 77th Street |        870 | CHILD ABANDONMENT                                         |     1 |
-| 77th Street |        931 | REPLICA FIREARMS(SALE,DISPLAY,MANUFACTURE OR DISTRIBUTE)  |     1 |
-| 77th Street |        933 | PROWLER                                                   |     1 |
-| 77th Street |        949 | ILLEGAL DUMPING                                           |     1 |
+| Area        | Crime Code | Crime                                                    | Count |
+|:------------|-----------:|:---------------------------------------------------------|------:|
+| 77th Street |        510 | VEHICLE - STOLEN                                         |  1765 |
+| 77th Street |        230 | ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT           |  1331 |
+| 77th Street |        624 | BATTERY - SIMPLE ASSAULT                                 |  1001 |
+| 77th Street |        626 | INTIMATE PARTNER - SIMPLE ASSAULT                        |   905 |
+| 77th Street |        210 | ROBBERY                                                  |   841 |
+| 77th Street |        740 | VANDALISM - FELONY (\$400 & OVER, ALL CHURCH VANDALISMS) |   772 |
 
 The top 5 crimes in 77th Street area are: Stolen Vehicle- 1,765 reports,
 Assault by Deadly Weapon - 1,331 reports, Battery - 1,001 reports,
@@ -690,7 +504,7 @@ st77_map
 This is a map of top 5 crimes in 77th Street area. There is a noticeable
 amount of purple dots which is the top reported crime, vehicle stolen.
 
-##### EDA \#3: Which month had the highest crime?
+#### EDA \#3: Which month had the highest crime?
 
 ``` r
 #detach(package:dplyr)
@@ -724,7 +538,7 @@ From 2020-2021, here is the number of reports per month. The cooler
 months (Feb - Apr) have a slightly lower number of reports while the
 warmer months (May - Aug) have a higher number of reports.
 
-##### EDA \#4: What is the breakdown of the victim’s age? Victim’s sex? Victim’s ethncity?
+#### EDA \#4: What is the breakdown of the victim’s age? Victim’s sex? Victim’s ethncity?
 
 ``` r
 #Create df
